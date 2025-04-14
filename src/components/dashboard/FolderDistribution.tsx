@@ -35,6 +35,9 @@ const data = [
   { name: "Archive", value: 3, color: "#FFF3E0" },
 ];
 
+// Calculate the total value for percentage calculations
+const totalValue = data.reduce((sum, item) => sum + item.value, 0);
+
 const renderActiveShape = (props: any) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
 
@@ -130,7 +133,9 @@ export function FolderDistribution() {
                     return (
                       <div className="bg-background border border-border rounded-lg p-2 shadow-lg">
                         <p className="font-medium">{payload[0].name}</p>
-                        <p className="text-sm">{`${payload[0].value} notes (${((payload[0].value / data.reduce((acc, item) => acc + item.value, 0)) * 100).toFixed(1)}%)`}</p>
+                        <p className="text-sm">
+                          {`${payload[0].value} notes (${((Number(payload[0].value) / totalValue) * 100).toFixed(1)}%)`}
+                        </p>
                       </div>
                     );
                   }
