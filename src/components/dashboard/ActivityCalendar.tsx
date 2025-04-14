@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Users } from "lucide-react";
 
 export function ActivityCalendar() {
   // Generate random activity data for the calendar
