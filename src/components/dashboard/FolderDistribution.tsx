@@ -1,12 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Sector } from "recharts";
 import { FolderOpen, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/components/layout/ThemeProvider";
 
-// Theme-aware color schemes
+// Theme-aware color schemes with improved contrast and accessibility
 const colorSchemes = {
   light: [
     "#8B5CF6", // Vibrant purple
@@ -77,9 +77,21 @@ const renderActiveShape = (props: any) => {
 
 export function FolderDistribution() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [animationKey, setAnimationKey] = useState(0);
+  const [chartReady, setChartReady] = useState(false);
   const { theme } = useTheme();
   
   const colors = theme === 'dark' ? colorSchemes.dark : colorSchemes.light;
+  
+  useEffect(() => {
+    // Trigger animation on load
+    setChartReady(true);
+  }, []);
+  
+  // Re-trigger animation when theme changes
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1);
+  }, [theme]);
   
   const onPieEnter = (_: any, index: number) => {
     setActiveIndex(index);
@@ -99,7 +111,16 @@ export function FolderDistribution() {
         <FolderOpen className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="p-0">
-        <div className="h-[240px] w-full p-4">
+        <motion.div 
+          className="h-[240px] w-full p-4"
+          key={animationKey}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ 
+            duration: 0.5,
+            ease: "easeOut"
+          }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -115,6 +136,10 @@ export function FolderDistribution() {
                 onMouseEnter={onPieEnter}
                 onMouseLeave={onPieLeave}
                 className="transition-all duration-300"
+                isAnimationActive={chartReady}
+                animationDuration={1000}
+                animationBegin={0}
+                animationEasing="ease-out-cubic"
               >
                 {data.map((entry, index) => (
                   <Cell 
@@ -131,12 +156,17 @@ export function FolderDistribution() {
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <div className="bg-background border border-border rounded-lg p-2 shadow-lg">
+                      <motion.div 
+                        className="bg-background border border-border rounded-lg p-2 shadow-lg"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
                         <p className="font-medium">{payload[0].name}</p>
                         <p className="text-sm">
                           {`${payload[0].value} notes (${((Number(payload[0].value) / totalValue) * 100).toFixed(1)}%)`}
                         </p>
-                      </div>
+                      </motion.div>
                     );
                   }
                   return null;
@@ -145,12 +175,21 @@ export function FolderDistribution() {
               />
             </PieChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
         
         <div className="p-4 border-t border-border/50 flex items-center justify-between">
           <div className="flex flex-wrap gap-3">
             {data.map((item, index) => (
-              <div key={index} className="flex items-center gap-1.5">
+              <motion.div 
+                key={index} 
+                className="flex items-center gap-1.5"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.1 + 0.3
+                }}
+              >
                 <div 
                   className="h-3 w-3 rounded-full" 
                   style={{ backgroundColor: colors[index % colors.length] }}
@@ -158,12 +197,17 @@ export function FolderDistribution() {
                 <span className="text-xs text-muted-foreground">
                   {item.name}
                 </span>
-              </div>
+              </motion.div>
             ))}
           </div>
-          <button className="text-xs text-accent flex items-center gap-1 hover:underline">
+          <motion.button 
+            className="text-xs text-accent flex items-center gap-1 hover:underline"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
             View all <ArrowUpRight className="h-3 w-3" />
-          </button>
+          </motion.button>
         </div>
       </CardContent>
     </Card>

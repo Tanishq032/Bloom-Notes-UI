@@ -1,14 +1,39 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tag, Calendar, Star, AlertTriangle, Clock } from "lucide-react";
+import { Tag, Calendar, Star, AlertTriangle, Clock, ArrowUpDown, SortAsc, SortDesc } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-export function SearchFilters() {
-  const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+interface SearchFiltersProps {
+  onFilterChange: (filters: any) => void;
+  activeFilters: {
+    folders: string[];
+    tags: string[];
+    priorities: string[];
+    isPinned: boolean;
+    isRecent: boolean;
+  };
+  onSortChange: (field: string, direction: string) => void;
+}
+
+export function SearchFilters({ onFilterChange, activeFilters, onSortChange }: SearchFiltersProps) {
+  const [selectedFolders, setSelectedFolders] = useState<string[]>(activeFilters.folders || []);
+  const [selectedTags, setSelectedTags] = useState<string[]>(activeFilters.tags || []);
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>(activeFilters.priorities || []);
+  const [isPinned, setIsPinned] = useState<boolean>(activeFilters.isPinned || false);
+  const [isRecent, setIsRecent] = useState<boolean>(activeFilters.isRecent || false);
+  const [sortField, setSortField] = useState<"date" | "title">("date");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   
   const folders = [
     { id: "work", name: "Work", color: "purple" },
@@ -17,6 +42,26 @@ export function SearchFilters() {
   ];
   
   const tags = ["meeting", "project", "design", "client", "health", "travel", "reading", "shopping"];
+  
+  useEffect(() => {
+    // Update local state when active filters change
+    setSelectedFolders(activeFilters.folders);
+    setSelectedTags(activeFilters.tags);
+    setSelectedPriorities(activeFilters.priorities);
+    setIsPinned(activeFilters.isPinned);
+    setIsRecent(activeFilters.isRecent);
+  }, [activeFilters]);
+  
+  useEffect(() => {
+    // Notify parent component when filters change
+    onFilterChange({
+      folders: selectedFolders,
+      tags: selectedTags,
+      priorities: selectedPriorities,
+      isPinned,
+      isRecent,
+    });
+  }, [selectedFolders, selectedTags, selectedPriorities, isPinned, isRecent]);
   
   const toggleFolder = (id: string) => {
     if (selectedFolders.includes(id)) {
@@ -34,13 +79,60 @@ export function SearchFilters() {
     }
   };
   
+  const togglePriority = (priority: string) => {
+    if (selectedPriorities.includes(priority)) {
+      setSelectedPriorities(selectedPriorities.filter(p => p !== priority));
+    } else {
+      setSelectedPriorities([...selectedPriorities, priority]);
+    }
+  };
+  
+  const handleSortChange = (field: "date" | "title", direction: "asc" | "desc") => {
+    setSortField(field);
+    setSortDirection(direction);
+    onSortChange(field, direction);
+  };
+  
+  const handleClearFilters = () => {
+    setSelectedFolders([]);
+    setSelectedTags([]);
+    setSelectedPriorities([]);
+    setIsPinned(false);
+    setIsRecent(false);
+  };
+  
   return (
     <Card className="mb-4 animate-fade-in">
       <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 font-medium">
-            <Tag className="h-4 w-4 text-accent" />
-            <span>Folders</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 font-medium">
+              <Tag className="h-4 w-4 text-accent" />
+              <span>Folders</span>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleSortChange("date", "desc")}>
+                  <Clock className="mr-2 h-4 w-4" /> Date (Newest)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("date", "asc")}>
+                  <Clock className="mr-2 h-4 w-4" /> Date (Oldest)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("title", "asc")}>
+                  <SortAsc className="mr-2 h-4 w-4" /> Title (A-Z)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("title", "desc")}>
+                  <SortDesc className="mr-2 h-4 w-4" /> Title (Z-A)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="flex flex-wrap gap-2">
             {folders.map((folder) => (
@@ -87,13 +179,28 @@ export function SearchFilters() {
               <span>Priority</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" size="sm" className="justify-start bg-blue-500/10 hover:bg-blue-500/20">
+              <Button 
+                variant={selectedPriorities.includes("low") ? "default" : "outline"} 
+                size="sm" 
+                className="justify-start bg-blue-500/10 hover:bg-blue-500/20"
+                onClick={() => togglePriority("low")}
+              >
                 <div className="w-2 h-2 rounded-full bg-blue-500 mr-2" /> Low
               </Button>
-              <Button variant="outline" size="sm" className="justify-start bg-yellow-500/10 hover:bg-yellow-500/20">
+              <Button 
+                variant={selectedPriorities.includes("medium") ? "default" : "outline"} 
+                size="sm" 
+                className="justify-start bg-yellow-500/10 hover:bg-yellow-500/20"
+                onClick={() => togglePriority("medium")}
+              >
                 <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2" /> Medium
               </Button>
-              <Button variant="outline" size="sm" className="justify-start bg-red-500/10 hover:bg-red-500/20">
+              <Button 
+                variant={selectedPriorities.includes("high") ? "default" : "outline"} 
+                size="sm" 
+                className="justify-start bg-red-500/10 hover:bg-red-500/20"
+                onClick={() => togglePriority("high")}
+              >
                 <div className="w-2 h-2 rounded-full bg-red-500 mr-2" /> High
               </Button>
             </div>
@@ -106,29 +213,28 @@ export function SearchFilters() {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
-                <Checkbox id="pinned" />
+                <Checkbox 
+                  id="pinned" 
+                  checked={isPinned}
+                  onCheckedChange={() => setIsPinned(!isPinned)}
+                />
                 <label htmlFor="pinned" className="text-sm cursor-pointer">Pinned</label>
               </div>
               <div className="flex items-center gap-1.5">
-                <Checkbox id="recent" />
+                <Checkbox 
+                  id="recent" 
+                  checked={isRecent}
+                  onCheckedChange={() => setIsRecent(!isRecent)}
+                />
                 <label htmlFor="recent" className="text-sm cursor-pointer">Recent</label>
               </div>
             </div>
           </div>
           
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 font-medium">
-              <Calendar className="h-4 w-4 text-accent" />
-              <span>Date Range</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="text-xs w-full">
-                <Calendar className="h-3 w-3 mr-1" /> Last 7 days
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs w-full">
-                <Calendar className="h-3 w-3 mr-1" /> Custom...
-              </Button>
-            </div>
+          <div className="pt-2 flex justify-between">
+            <Button variant="outline" size="sm" className="text-xs w-full" onClick={handleClearFilters}>
+              Clear Filters
+            </Button>
           </div>
         </div>
       </CardContent>

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,16 @@ export function Sidebar({ className }: SidebarProps) {
   const [selectedFolder, setSelectedFolder] = useState("inbox");
   const [hoveredFolder, setHoveredFolder] = useState<string | null>(null);
   const location = useLocation();
+
+  useEffect(() => {
+    // Update selected folder based on URL path
+    const path = location.pathname;
+    if (path === "/") {
+      setSelectedFolder("inbox");
+    } else if (path === "/notes") {
+      setSelectedFolder("personal");
+    }
+  }, [location.pathname]);
 
   return (
     <motion.div 
@@ -89,10 +99,10 @@ export function Sidebar({ className }: SidebarProps) {
                     className={cn(
                       "w-full justify-start font-normal transition-all duration-200",
                       collapsed ? "px-2" : "px-4",
-                      location.pathname === "/" ? "bg-sidebar-accent" : ""
+                      location.pathname === "/" ? "bg-sidebar-accent text-accent" : ""
                     )}
                   >
-                    <Home className="h-4 w-4 mr-2" />
+                    <Home className={cn("h-4 w-4 mr-2", location.pathname === "/" ? "text-accent" : "")} />
                     <AnimatePresence>
                       {!collapsed && (
                         <motion.span
@@ -119,10 +129,10 @@ export function Sidebar({ className }: SidebarProps) {
                     className={cn(
                       "w-full justify-start font-normal transition-all duration-200",
                       collapsed ? "px-2" : "px-4",
-                      location.pathname === "/notes" ? "bg-sidebar-accent" : ""
+                      location.pathname === "/notes" ? "bg-sidebar-accent text-accent" : ""
                     )}
                   >
-                    <Edit3 className="h-4 w-4 mr-2" />
+                    <Edit3 className={cn("h-4 w-4 mr-2", location.pathname === "/notes" ? "text-accent" : "")} />
                     <AnimatePresence>
                       {!collapsed && (
                         <motion.span
@@ -155,59 +165,61 @@ export function Sidebar({ className }: SidebarProps) {
                 {folders.map((folder) => (
                   <Tooltip key={folder.id}>
                     <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className={cn(
-                          "w-full justify-start font-normal group relative transition-all duration-200",
-                          collapsed ? "px-2" : "px-3",
-                          selectedFolder === folder.id ? "bg-sidebar-accent" : "",
-                          hoveredFolder === folder.id ? "bg-sidebar-accent/50" : ""
-                        )}
-                        onClick={() => setSelectedFolder(folder.id)}
-                        onMouseEnter={() => setHoveredFolder(folder.id)}
-                        onMouseLeave={() => setHoveredFolder(null)}
-                      >
-                        <div 
+                      <Link to="/notes">
+                        <Button
+                          variant="ghost"
                           className={cn(
-                            "p-1 rounded-md mr-2 transition-all duration-300 z-10",
-                            `bg-folder-${folder.color}`,
-                            selectedFolder === folder.id ? "scale-110" : ""
+                            "w-full justify-start font-normal group relative transition-all duration-200",
+                            collapsed ? "px-2" : "px-3",
+                            selectedFolder === folder.id ? "bg-sidebar-accent" : "",
+                            hoveredFolder === folder.id ? "bg-sidebar-accent/50" : ""
                           )}
+                          onClick={() => setSelectedFolder(folder.id)}
+                          onMouseEnter={() => setHoveredFolder(folder.id)}
+                          onMouseLeave={() => setHoveredFolder(null)}
                         >
-                          <folder.icon className="h-4 w-4" />
-                        </div>
-                        <AnimatePresence>
-                          {!collapsed && (
-                            <motion.div 
-                              className="flex items-center justify-between w-full"
-                              initial={{ opacity: 0, width: 0 }}
-                              animate={{ opacity: 1, width: "auto" }}
-                              exit={{ opacity: 0, width: 0 }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <div className="flex items-center">
-                                <span>{folder.name}</span>
-                                {folder.collaborative && (
-                                  <Badge className="ml-2 h-4 text-[0.6rem] px-1 py-0 bg-blue-500/20 text-blue-500">
-                                    <Users className="h-2 w-2 mr-0.5" /> Shared
-                                  </Badge>
-                                )}
-                              </div>
-                              <span className="text-xs text-muted-foreground bg-muted px-1.5 rounded-full">
-                                {folder.count}
-                              </span>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                        
-                        {!collapsed && (
-                          <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-accent/10">
-                              <MoreHorizontal className="h-3 w-3" />
-                            </Button>
+                          <div 
+                            className={cn(
+                              "p-1 rounded-md mr-2 transition-all duration-300 z-10",
+                              `bg-folder-${folder.color}`,
+                              selectedFolder === folder.id ? "scale-110" : ""
+                            )}
+                          >
+                            <folder.icon className="h-4 w-4" />
                           </div>
-                        )}
-                      </Button>
+                          <AnimatePresence>
+                            {!collapsed && (
+                              <motion.div 
+                                className="flex items-center justify-between w-full"
+                                initial={{ opacity: 0, width: 0 }}
+                                animate={{ opacity: 1, width: "auto" }}
+                                exit={{ opacity: 0, width: 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <div className="flex items-center">
+                                  <span>{folder.name}</span>
+                                  {folder.collaborative && (
+                                    <Badge className="ml-2 h-4 text-[0.6rem] px-1 py-0 bg-blue-500/20 text-blue-500">
+                                      <Users className="h-2 w-2 mr-0.5" /> Shared
+                                    </Badge>
+                                  )}
+                                </div>
+                                <span className="text-xs text-muted-foreground bg-muted px-1.5 rounded-full">
+                                  {folder.count}
+                                </span>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                          
+                          {!collapsed && (
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-accent/10">
+                                <MoreHorizontal className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          )}
+                        </Button>
+                      </Link>
                     </TooltipTrigger>
                     {collapsed && (
                       <TooltipContent side="right">
@@ -228,28 +240,30 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="p-3 border-t flex flex-col gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button 
-              variant="outline" 
-              className={cn(
-                "w-full justify-start gap-2 transition-all duration-300",
-                "bg-accent/5 hover:bg-accent/10 hover:text-accent border-accent/20"
-              )}
-              size={collapsed ? "icon" : "default"}
-            >
-              <FolderPlus className="h-4 w-4" />
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: "auto" }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    New Folder
-                  </motion.span>
+            <Link to="/notes">
+              <Button 
+                variant="outline" 
+                className={cn(
+                  "w-full justify-start gap-2 transition-all duration-300",
+                  "bg-accent/5 hover:bg-accent/10 hover:text-accent border-accent/20"
                 )}
-              </AnimatePresence>
-            </Button>
+                size={collapsed ? "icon" : "default"}
+              >
+                <FolderPlus className="h-4 w-4" />
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: "auto" }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      New Folder
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Button>
+            </Link>
           </TooltipTrigger>
           {collapsed && <TooltipContent side="right">New Folder</TooltipContent>}
         </Tooltip>
