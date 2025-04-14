@@ -6,12 +6,24 @@ import { NotesEditor } from "@/components/notes/NotesEditor";
 import { Note } from "@/types/notes";
 import { useToast } from "@/components/ui/use-toast";
 import { useTheme } from "@/components/layout/ThemeProvider";
+import { useLocation } from "react-router-dom";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { NoteGrid } from "@/components/notes/NoteGrid";
 
 export function Notes() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [activeFolder, setActiveFolder] = useState<string>("inbox");
   const { toast } = useToast();
   const { theme } = useTheme();
+  const location = useLocation();
+
+  // Check for folder in location state
+  useEffect(() => {
+    if (location.state && location.state.folder) {
+      setActiveFolder(location.state.folder);
+    }
+  }, [location.state]);
 
   // Load notes from localStorage on mount
   useEffect(() => {
@@ -64,19 +76,27 @@ export function Notes() {
     });
   };
 
+  const handleFolderSelect = (folderId: string) => {
+    setActiveFolder(folderId);
+  };
+
   return (
     <ThemeProvider>
-      <MainLayout>
+      <MainLayout sidebar={<Sidebar onFolderSelect={handleFolderSelect} activeFolder={activeFolder} />}>
         <div className="space-y-6">
           <h1 className="text-3xl font-bold tracking-tight">My Notes</h1>
-          <NotesEditor 
-            notes={notes}
-            selectedNote={selectedNote}
-            setSelectedNote={setSelectedNote}
-            onCreateNote={handleCreateNote}
-            onUpdateNote={handleUpdateNote}
-            onDeleteNote={handleDeleteNote}
-          />
+          {location.pathname === "/notes" && !location.search ? (
+            <NoteGrid activeFolder={activeFolder} />
+          ) : (
+            <NotesEditor 
+              notes={notes}
+              selectedNote={selectedNote}
+              setSelectedNote={setSelectedNote}
+              onCreateNote={handleCreateNote}
+              onUpdateNote={handleUpdateNote}
+              onDeleteNote={handleDeleteNote}
+            />
+          )}
         </div>
       </MainLayout>
     </ThemeProvider>

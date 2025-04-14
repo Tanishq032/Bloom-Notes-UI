@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { NoteCard } from "./NoteCard";
 import { AnimatePresence, motion } from "framer-motion";
@@ -96,7 +97,7 @@ const dummyNotes: NoteType[] = [
   },
 ];
 
-export function NoteGrid() {
+export function NoteGrid({ activeFolder }: { activeFolder?: string }) {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [notes, setNotes] = useState<NoteType[]>(dummyNotes);
@@ -113,6 +114,21 @@ export function NoteGrid() {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Apply folder filter from sidebar navigation
+  useEffect(() => {
+    if (activeFolder && activeFolder !== 'inbox') {
+      setActiveFilters(prev => ({
+        ...prev,
+        folders: [activeFolder.toLowerCase()]
+      }));
+    } else if (activeFolder === 'inbox') {
+      setActiveFilters(prev => ({
+        ...prev,
+        folders: []
+      }));
+    }
+  }, [activeFolder]);
 
   useEffect(() => {
     let result = [...notes];

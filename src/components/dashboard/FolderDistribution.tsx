@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Sector } from "recharts";
@@ -48,7 +49,7 @@ const renderActiveShape = (props: any) => {
         startAngle={startAngle}
         endAngle={endAngle}
         fill={fill}
-        className="drop-shadow-md"
+        className="drop-shadow-md transition-all duration-300"
       />
       <Sector
         cx={cx}
@@ -58,14 +59,15 @@ const renderActiveShape = (props: any) => {
         innerRadius={innerRadius - 6}
         outerRadius={innerRadius - 2}
         fill={fill}
+        className="transition-all duration-300"
       />
-      <text x={cx} y={cy} dy={-15} textAnchor="middle" fill="currentColor" className="text-[10px]">
+      <text x={cx} y={cy} dy={-15} textAnchor="middle" fill="currentColor" className="text-[10px] animate-fade-in">
         {payload.name}
       </text>
-      <text x={cx} y={cy} dy={8} textAnchor="middle" fill="currentColor" className="text-[14px] font-medium">
+      <text x={cx} y={cy} dy={8} textAnchor="middle" fill="currentColor" className="text-[14px] font-medium animate-fade-in">
         {payload.value}
       </text>
-      <text x={cx} y={cy} dy={25} textAnchor="middle" fill="currentColor" className="text-[10px]">
+      <text x={cx} y={cy} dy={25} textAnchor="middle" fill="currentColor" className="text-[10px] animate-fade-in">
         {`${(percent * 100).toFixed(1)}%`}
       </text>
     </g>
@@ -93,6 +95,14 @@ export function FolderDistribution() {
   };
   
   const onPieLeave = () => {
+    setActiveIndex(null);
+  };
+
+  const handleMouseEnter = (data: any, index: number) => {
+    setActiveIndex(index);
+  };
+
+  const handleMouseLeave = () => {
     setActiveIndex(null);
   };
   
@@ -130,7 +140,7 @@ export function FolderDistribution() {
                 activeShape={renderActiveShape}
                 onMouseEnter={onPieEnter}
                 onMouseLeave={onPieLeave}
-                className="transition-all duration-300"
+                className="transition-all duration-300 hover:cursor-pointer"
                 isAnimationActive={chartReady}
                 animationDuration={1000}
                 animationBegin={0}
@@ -143,7 +153,13 @@ export function FolderDistribution() {
                     className="transition-all duration-300 hover:opacity-80"
                     style={{
                       filter: activeIndex === index ? 'drop-shadow(0px 0px 4px rgba(0,0,0,0.3))' : 'none',
+                      transform: activeIndex === index ? 'scale(1.05)' : 'scale(1)',
+                      transformOrigin: 'center',
+                      transformBox: 'fill-box',
+                      transition: 'transform 0.3s ease, filter 0.3s ease',
                     }}
+                    onMouseEnter={() => handleMouseEnter(entry, index)}
+                    onMouseLeave={handleMouseLeave}
                   />
                 ))}
               </Pie>
@@ -184,12 +200,17 @@ export function FolderDistribution() {
                   duration: 0.3,
                   delay: index * 0.1 + 0.3
                 }}
+                onMouseEnter={() => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
               >
                 <div 
-                  className="h-3 w-3 rounded-full" 
-                  style={{ backgroundColor: colors[index % colors.length] }}
+                  className="h-3 w-3 rounded-full transition-transform duration-200 hover:scale-125" 
+                  style={{ 
+                    backgroundColor: colors[index % colors.length],
+                    transform: activeIndex === index ? 'scale(1.25)' : 'scale(1)',
+                  }}
                 ></div>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   {item.name}
                 </span>
               </motion.div>
@@ -200,6 +221,7 @@ export function FolderDistribution() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
+            whileHover={{ scale: 1.05 }}
           >
             View all <ArrowUpRight className="h-3 w-3" />
           </motion.button>

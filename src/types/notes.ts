@@ -12,4 +12,5 @@ export interface Note {
   isPinned?: boolean;
   priority?: "low" | "medium" | "high";
   tags?: string[];
+  date?: string; // Added for compatibility with NoteGrid component
 }
