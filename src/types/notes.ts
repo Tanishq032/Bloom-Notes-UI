@@ -5,5 +5,11 @@ export interface Note {
   content: string;
   createdAt: string;
   updatedAt: string;
+  folder?: {
+    name: string;
+    color: string;
+  };
+  isPinned?: boolean;
+  priority?: "low" | "medium" | "high";
   tags?: string[];
 }

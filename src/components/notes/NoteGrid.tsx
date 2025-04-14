@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { NoteCard } from "./NoteCard";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,8 +6,23 @@ import { Filter, List, Grid, Plus } from "lucide-react";
 import { SearchFilters } from "./SearchFilters";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
-const dummyNotes = [
+type NoteType = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  folder: { 
+    name: string; 
+    color: string;
+  };
+  isPinned?: boolean;
+  priority?: "low" | "medium" | "high";
+  tags?: string[];
+};
+
+const dummyNotes: NoteType[] = [
   {
     id: "1",
     title: "Project Kickoff Meeting",
@@ -85,8 +99,8 @@ const dummyNotes = [
 export function NoteGrid() {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [notes, setNotes] = useState(dummyNotes);
-  const [filteredNotes, setFilteredNotes] = useState(dummyNotes);
+  const [notes, setNotes] = useState<NoteType[]>(dummyNotes);
+  const [filteredNotes, setFilteredNotes] = useState<NoteType[]>(dummyNotes);
   const [sortBy, setSortBy] = useState<"date" | "title">("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [activeFilters, setActiveFilters] = useState({
@@ -100,37 +114,31 @@ export function NoteGrid() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Apply filters when activeFilters change
   useEffect(() => {
     let result = [...notes];
     
-    // Filter by folders
     if (activeFilters.folders.length > 0) {
       result = result.filter(note => 
         activeFilters.folders.includes(note.folder.name.toLowerCase())
       );
     }
     
-    // Filter by tags
     if (activeFilters.tags.length > 0) {
       result = result.filter(note => 
         note.tags && note.tags.some(tag => activeFilters.tags.includes(tag))
       );
     }
     
-    // Filter by priorities
     if (activeFilters.priorities.length > 0) {
       result = result.filter(note => 
         note.priority && activeFilters.priorities.includes(note.priority)
       );
     }
     
-    // Filter by pinned status
     if (activeFilters.isPinned) {
       result = result.filter(note => note.isPinned);
     }
     
-    // Filter by recent (last 7 days)
     if (activeFilters.isRecent) {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -140,21 +148,18 @@ export function NoteGrid() {
       });
     }
     
-    // Sort the filtered results
     result = sortNotes(result, sortBy, sortDirection);
     
     setFilteredNotes(result);
   }, [activeFilters, notes, sortBy, sortDirection]);
   
-  // Sort notes function
-  const sortNotes = (notesToSort: typeof dummyNotes, sortByField: "date" | "title", direction: "asc" | "desc") => {
+  const sortNotes = (notesToSort: NoteType[], sortByField: "date" | "title", direction: "asc" | "desc") => {
     return [...notesToSort].sort((a, b) => {
       if (sortByField === "date") {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
         return direction === "asc" ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
       } else {
-        // Sort by title
         return direction === "asc" 
           ? a.title.localeCompare(b.title) 
           : b.title.localeCompare(a.title);
@@ -162,7 +167,6 @@ export function NoteGrid() {
     });
   };
   
-  // Handle toggling pin status
   const handleTogglePin = (id: string) => {
     const updatedNotes = notes.map(note => 
       note.id === id ? { ...note, isPinned: !note.isPinned } : note
@@ -178,7 +182,6 @@ export function NoteGrid() {
     });
   };
   
-  // Handle deleting a note
   const handleDeleteNote = (id: string) => {
     const updatedNotes = notes.filter(note => note.id !== id);
     setNotes(updatedNotes);
@@ -190,7 +193,6 @@ export function NoteGrid() {
     });
   };
   
-  // Update filter settings
   const handleFilterUpdate = (newFilters: any) => {
     setActiveFilters({ ...activeFilters, ...newFilters });
   };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Sector } from "recharts";
@@ -6,25 +5,24 @@ import { FolderOpen, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/components/layout/ThemeProvider";
 
-// Theme-aware color schemes with improved contrast and accessibility
 const colorSchemes = {
   light: [
-    "#8B5CF6", // Vibrant purple
-    "#F59E0B", // Amber
-    "#10B981", // Emerald
-    "#EC4899", // Pink
-    "#3B82F6", // Blue
-    "#F43F5E", // Rose
-    "#14B8A6", // Teal
+    "#8B5CF6",
+    "#F59E0B",
+    "#10B981",
+    "#EC4899",
+    "#3B82F6",
+    "#F43F5E",
+    "#14B8A6",
   ],
   dark: [
-    "#A78BFA", // Brighter purple
-    "#FBBF24", // Brighter amber
-    "#34D399", // Brighter emerald
-    "#F472B6", // Brighter pink
-    "#60A5FA", // Brighter blue
-    "#FB7185", // Brighter rose
-    "#2DD4BF", // Brighter teal
+    "#A78BFA",
+    "#FBBF24",
+    "#34D399",
+    "#F472B6",
+    "#60A5FA",
+    "#FB7185",
+    "#2DD4BF",
   ]
 };
 
@@ -35,7 +33,6 @@ const data = [
   { name: "Archive", value: 3, color: "#FFF3E0" },
 ];
 
-// Calculate the total value for percentage calculations
 const totalValue = data.reduce((sum, item) => sum + item.value, 0);
 
 const renderActiveShape = (props: any) => {
@@ -84,11 +81,9 @@ export function FolderDistribution() {
   const colors = theme === 'dark' ? colorSchemes.dark : colorSchemes.light;
   
   useEffect(() => {
-    // Trigger animation on load
     setChartReady(true);
   }, []);
   
-  // Re-trigger animation when theme changes
   useEffect(() => {
     setAnimationKey(prev => prev + 1);
   }, [theme]);
@@ -139,7 +134,7 @@ export function FolderDistribution() {
                 isAnimationActive={chartReady}
                 animationDuration={1000}
                 animationBegin={0}
-                animationEasing="ease-out-cubic"
+                animationEasing="ease"
               >
                 {data.map((entry, index) => (
                   <Cell 
