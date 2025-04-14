@@ -3,8 +3,9 @@ import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Pin, Trash } from "lucide-react";
+import { Edit, Pin, Trash, Clock, Tag, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface NoteCardProps {
   id: string;
@@ -16,6 +17,8 @@ interface NoteCardProps {
     color: string;
   };
   isPinned?: boolean;
+  priority?: "low" | "medium" | "high";
+  tags?: string[];
   className?: string;
   onClick?: () => void;
 }
@@ -27,15 +30,24 @@ export function NoteCard({
   date, 
   folder, 
   isPinned = false,
+  priority,
+  tags = [],
   className,
   onClick
 }: NoteCardProps) {
   const [showActions, setShowActions] = useState(false);
   
+  const priorityColors = {
+    low: "bg-blue-500/20 text-blue-500",
+    medium: "bg-yellow-500/20 text-yellow-500",
+    high: "bg-red-500/20 text-red-500"
+  };
+  
   return (
     <Card 
       className={cn(
-        "card-hover cursor-pointer relative overflow-hidden animate-scale-in", 
+        "card-hover cursor-pointer relative overflow-hidden transition-all duration-300 group animate-scale-in",
+        "hover:shadow-lg hover:-translate-y-1 hover:shadow-accent/20",
         className
       )}
       onMouseEnter={() => setShowActions(true)}
@@ -43,39 +55,67 @@ export function NoteCard({
       onClick={onClick}
     >
       {isPinned && (
-        <div className="absolute top-2 right-2 z-10">
+        <div className="absolute top-2 right-2 z-10 animate-pulse">
           <Pin className="h-4 w-4 text-accent" fill="currentColor" />
         </div>
       )}
       
       <CardHeader className="p-4 pb-0">
-        <CardTitle className="text-lg font-semibold line-clamp-1">{title}</CardTitle>
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-lg font-semibold line-clamp-1">{title}</CardTitle>
+          {priority && (
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <div className={cn("rounded-full p-1 ml-2", priorityColors[priority])}>
+                  <AlertCircle className="h-3 w-3" />
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-auto p-2 text-xs animate-fade-in">
+                {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
+              </HoverCardContent>
+            </HoverCard>
+          )}
+        </div>
       </CardHeader>
       
       <CardContent className="p-4 pt-2">
         <p className="text-sm text-muted-foreground line-clamp-3">{content}</p>
       </CardContent>
       
-      <CardFooter className="p-4 pt-0 flex items-center justify-between">
-        <Badge variant="outline" className={cn(
-          "text-xs font-normal",
-          `bg-folder-${folder.color} bg-opacity-50`
-        )}>
-          {folder.name}
-        </Badge>
-        <span className="text-xs text-muted-foreground">{date}</span>
+      <CardFooter className="p-4 pt-0 flex flex-col gap-2 items-start">
+        <div className="flex items-center justify-between w-full">
+          <Badge variant="outline" className={cn(
+            "text-xs font-normal transition-colors duration-300",
+            `bg-folder-${folder.color} bg-opacity-50 hover:bg-opacity-70`
+          )}>
+            {folder.name}
+          </Badge>
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Clock className="h-3 w-3" /> {date}
+          </span>
+        </div>
+        
+        {tags.length > 0 && (
+          <div className="flex items-center gap-1 flex-wrap mt-1">
+            {tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0 bg-secondary/60">
+                <Tag className="h-2.5 w-2.5 mr-1" />{tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardFooter>
       
       {showActions && (
-        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent bg-opacity-80 flex items-end justify-center p-4 animate-fade-in">
+        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent bg-opacity-80 flex items-end justify-center p-4 transition-opacity duration-300 animate-fade-in">
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" className="rounded-full w-8 h-8 p-0">
+            <Button size="sm" variant="outline" className="rounded-full w-8 h-8 p-0 transition-transform duration-200 hover:scale-110 ripple">
               <Edit className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="outline" className="rounded-full w-8 h-8 p-0">
+            <Button size="sm" variant="outline" className="rounded-full w-8 h-8 p-0 transition-transform duration-200 hover:scale-110 ripple">
               <Pin className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="outline" className="rounded-full w-8 h-8 p-0 text-destructive">
+            <Button size="sm" variant="outline" className="rounded-full w-8 h-8 p-0 text-destructive transition-transform duration-200 hover:scale-110 ripple">
               <Trash className="h-4 w-4" />
             </Button>
           </div>
