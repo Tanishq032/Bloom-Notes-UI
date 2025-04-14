@@ -4,6 +4,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Sector } from "recharts";
 import { FolderOpen, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTheme } from "@/components/layout/ThemeProvider";
+
+// Theme-aware color schemes
+const colorSchemes = {
+  light: [
+    "#8B5CF6", // Vibrant purple
+    "#F59E0B", // Amber
+    "#10B981", // Emerald
+    "#EC4899", // Pink
+    "#3B82F6", // Blue
+    "#F43F5E", // Rose
+    "#14B8A6", // Teal
+  ],
+  dark: [
+    "#A78BFA", // Brighter purple
+    "#FBBF24", // Brighter amber
+    "#34D399", // Brighter emerald
+    "#F472B6", // Brighter pink
+    "#60A5FA", // Brighter blue
+    "#FB7185", // Brighter rose
+    "#2DD4BF", // Brighter teal
+  ]
+};
 
 const data = [
   { name: "Personal", value: 8, color: "#FCE4EC" },
@@ -36,13 +59,13 @@ const renderActiveShape = (props: any) => {
         outerRadius={innerRadius - 2}
         fill={fill}
       />
-      <text x={cx} y={cy} dy={-15} textAnchor="middle" fill="#999" className="text-[10px]">
+      <text x={cx} y={cy} dy={-15} textAnchor="middle" fill="currentColor" className="text-[10px]">
         {payload.name}
       </text>
-      <text x={cx} y={cy} dy={8} textAnchor="middle" fill="#333" className="text-[14px] font-medium">
+      <text x={cx} y={cy} dy={8} textAnchor="middle" fill="currentColor" className="text-[14px] font-medium">
         {payload.value}
       </text>
-      <text x={cx} y={cy} dy={25} textAnchor="middle" fill="#999" className="text-[10px]">
+      <text x={cx} y={cy} dy={25} textAnchor="middle" fill="currentColor" className="text-[10px]">
         {`${(percent * 100).toFixed(1)}%`}
       </text>
     </g>
@@ -51,6 +74,9 @@ const renderActiveShape = (props: any) => {
 
 export function FolderDistribution() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const { theme } = useTheme();
+  
+  const colors = theme === 'dark' ? colorSchemes.dark : colorSchemes.light;
   
   const onPieEnter = (_: any, index: number) => {
     setActiveIndex(index);
@@ -90,7 +116,7 @@ export function FolderDistribution() {
                 {data.map((entry, index) => (
                   <Cell 
                     key={`cell-${index}`} 
-                    fill={entry.color} 
+                    fill={colors[index % colors.length]} 
                     className="transition-all duration-300 hover:opacity-80"
                     style={{
                       filter: activeIndex === index ? 'drop-shadow(0px 0px 4px rgba(0,0,0,0.3))' : 'none',
@@ -99,12 +125,16 @@ export function FolderDistribution() {
                 ))}
               </Pie>
               <Tooltip 
-                contentStyle={{
-                  backgroundColor: "var(--background)",
-                  borderColor: "var(--border)",
-                  borderRadius: "var(--radius)",
-                  fontSize: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-background border border-border rounded-lg p-2 shadow-lg">
+                        <p className="font-medium">{payload[0].name}</p>
+                        <p className="text-sm">{`${payload[0].value} notes (${((payload[0].value / data.reduce((acc, item) => acc + item.value, 0)) * 100).toFixed(1)}%)`}</p>
+                      </div>
+                    );
+                  }
+                  return null;
                 }}
                 wrapperStyle={{ outline: "none" }}
               />
@@ -118,7 +148,7 @@ export function FolderDistribution() {
               <div key={index} className="flex items-center gap-1.5">
                 <div 
                   className="h-3 w-3 rounded-full" 
-                  style={{ backgroundColor: item.color }}
+                  style={{ backgroundColor: colors[index % colors.length] }}
                 ></div>
                 <span className="text-xs text-muted-foreground">
                   {item.name}

@@ -5,8 +5,9 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { NoteGrid } from "@/components/notes/NoteGrid";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Plus, X, FileText } from "lucide-react";
+import { Plus, X, FileText, Edit3 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -84,29 +85,38 @@ export function Home() {
             <TabsTrigger value={TAB_VALUES.DASHBOARD}>Dashboard</TabsTrigger>
           </TabsList>
           
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="gap-2 bg-accent hover:bg-accent/90">
-                  <Plus className="h-4 w-4" />
-                  New Note
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <FileText className="h-4 w-4 mr-2" />
-                  <span>Blank Note</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <FileText className="h-4 w-4 mr-2" />
-                  <span>From Template</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </motion.div>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/notes">
+                <Edit3 className="h-4 w-4" />
+                Full Notes Editor
+              </Link>
+            </Button>
+            
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-accent hover:bg-accent/90">
+                    <Plus className="h-4 w-4" />
+                    New Note
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <FileText className="h-4 w-4 mr-2" />
+                    <span>Blank Note</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <FileText className="h-4 w-4 mr-2" />
+                    <span>From Template</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </motion.div>
+          </div>
         </div>
         
         <AnimatePresence mode="wait">

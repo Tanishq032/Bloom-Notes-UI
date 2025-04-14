@@ -1,11 +1,12 @@
 
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, ChevronRight, FolderPlus, 
   Inbox, Archive, Star, Trash, Settings,
-  FolderOpen, File, Home, Users, Plus, MoreHorizontal, Calendar
+  FolderOpen, File, Home, Users, Plus, MoreHorizontal, Calendar, Edit3
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -40,6 +41,7 @@ export function Sidebar({ className }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState("inbox");
   const [hoveredFolder, setHoveredFolder] = useState<string | null>(null);
+  const location = useLocation();
 
   return (
     <motion.div 
@@ -81,30 +83,62 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className={cn(
-                    "w-full justify-start font-normal transition-all duration-200",
-                    collapsed ? "px-2" : "px-4",
-                    selectedFolder === "dashboard" ? "bg-sidebar-accent" : ""
-                  )}
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  <AnimatePresence>
-                    {!collapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: "auto" }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        Dashboard
-                      </motion.span>
+                <Link to="/">
+                  <Button 
+                    variant="ghost" 
+                    className={cn(
+                      "w-full justify-start font-normal transition-all duration-200",
+                      collapsed ? "px-2" : "px-4",
+                      location.pathname === "/" ? "bg-sidebar-accent" : ""
                     )}
-                  </AnimatePresence>
-                </Button>
+                  >
+                    <Home className="h-4 w-4 mr-2" />
+                    <AnimatePresence>
+                      {!collapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: "auto" }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          Dashboard
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </Button>
+                </Link>
               </TooltipTrigger>
               {collapsed && <TooltipContent side="right">Dashboard</TooltipContent>}
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to="/notes">
+                  <Button 
+                    variant="ghost" 
+                    className={cn(
+                      "w-full justify-start font-normal transition-all duration-200",
+                      collapsed ? "px-2" : "px-4",
+                      location.pathname === "/notes" ? "bg-sidebar-accent" : ""
+                    )}
+                  >
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    <AnimatePresence>
+                      {!collapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: "auto" }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          Notes
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              {collapsed && <TooltipContent side="right">Notes</TooltipContent>}
             </Tooltip>
             
             <div className="mt-4 space-y-1">
