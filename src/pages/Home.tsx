@@ -5,8 +5,14 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { NoteGrid } from "@/components/notes/NoteGrid";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus, X, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 const TAB_VALUES = {
   NOTES: "notes",
@@ -82,10 +88,24 @@ export function Home() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button className="gap-2 bg-accent hover:bg-accent/90">
-              <Plus className="h-4 w-4" />
-              New Note
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="gap-2 bg-accent hover:bg-accent/90">
+                  <Plus className="h-4 w-4" />
+                  New Note
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <FileText className="h-4 w-4 mr-2" />
+                  <span>Blank Note</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <FileText className="h-4 w-4 mr-2" />
+                  <span>From Template</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </motion.div>
         </div>
         

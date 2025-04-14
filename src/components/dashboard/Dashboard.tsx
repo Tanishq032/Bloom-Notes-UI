@@ -46,7 +46,6 @@ export function Dashboard() {
             value={42} 
             icon={<FileText className="h-4 w-4 text-muted-foreground" />}
             description="+8 from last week"
-            trend="up"
           />
         </motion.div>
         
@@ -63,7 +62,6 @@ export function Dashboard() {
             title="Starred Notes" 
             value={5} 
             icon={<Star className="h-4 w-4 text-muted-foreground" />}
-            trend="neutral"
           />
         </motion.div>
         
@@ -73,7 +71,6 @@ export function Dashboard() {
             value="6 days" 
             icon={<Clock className="h-4 w-4 text-muted-foreground" />}
             description="Keep going! Your best is 14 days."
-            trend="up"
           />
         </motion.div>
       </motion.div>
@@ -101,7 +98,6 @@ export function Dashboard() {
                 icon={<Tag className="h-4 w-4 text-muted-foreground" />}
                 description="Most used: project, meeting, idea"
                 className="h-full"
-                horizontal
               />
               
               <StatCard 
@@ -110,7 +106,6 @@ export function Dashboard() {
                 icon={<Users className="h-4 w-4 text-muted-foreground" />}
                 description="3 collaborators"
                 className="h-full"
-                horizontal
               />
               
               <StatCard 
@@ -119,7 +114,6 @@ export function Dashboard() {
                 icon={<Clock className="h-4 w-4 text-muted-foreground" />}
                 description="Next: Team Meeting (Tomorrow)"
                 className="h-full"
-                horizontal
               />
             </div>
           </motion.div>

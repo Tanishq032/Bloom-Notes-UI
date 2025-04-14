@@ -104,22 +104,26 @@ export function TopBar() {
                 transition={{ duration: 0.15 }}
               >
                 <div className="px-2 py-1 text-xs font-medium text-muted-foreground">Create New</div>
-                <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
-                  <File className="h-4 w-4 text-accent" />
-                  <span>Note</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
-                  <Folder className="h-4 w-4 text-accent" />
-                  <span>Folder</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
-                  <Tag className="h-4 w-4 text-accent" />
-                  <span>Tag</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
-                  <Calendar className="h-4 w-4 text-accent" />
-                  <span>Reminder</span>
-                </DropdownMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuContent forceMount className="p-0 border-0 shadow-none min-w-0 bg-transparent">
+                    <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
+                      <File className="h-4 w-4 text-accent" />
+                      <span>Note</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
+                      <Folder className="h-4 w-4 text-accent" />
+                      <span>Folder</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
+                      <Tag className="h-4 w-4 text-accent" />
+                      <span>Tag</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer gap-2 py-1.5">
+                      <Calendar className="h-4 w-4 text-accent" />
+                      <span>Reminder</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </motion.div>
             )}
           </AnimatePresence>
