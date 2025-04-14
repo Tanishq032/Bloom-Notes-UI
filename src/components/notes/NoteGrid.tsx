@@ -307,7 +307,3 @@ export function NoteGrid() {
     </div>
   );
 }
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
-}
