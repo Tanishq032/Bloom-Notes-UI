@@ -60,3 +60,5 @@ Whether you're tweaking the design or adding features, feel free to edit and exp
 ## 📬 Feedback
 
 This project is constantly improving. If you have suggestions, want to contribute, or find bugs — feel free to open issues or make a pull request.
+
+---
